@@ -1,9 +1,5 @@
 package deribit
 
-import (
-	"encoding/json"
-)
-
 const (
 	urlGetInstruments = "/api/v2/public/get_instruments"
 	urlGetInstrument  = "/api/v2/public/get_instrument"
@@ -12,49 +8,45 @@ const (
 )
 
 // GetInstruments https://docs.deribit.com/?shell#public-get_instrument
-func (c *Client) GetInstruments(currency, kind string, expired bool) (o InstrumentListResult, err error) {
-	res, err := c.Get(urlGetInstruments, map[string]interface{}{
+func (c *Client) GetInstruments(currency, kind string, expired bool) (instrumentList []Instrument, err error) {
+	var instrumentListResp InstrumentListResp
+	if err = c.GetAndUnmarshalJson(urlGetInstruments, map[string]interface{}{
 		"currency": currency,
 		"kind":     kind,
 		"expired":  expired,
-	})
-	if err != nil {
-		return o, err
+	}, &instrumentListResp); err != nil {
+		return instrumentList, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return instrumentListResp.Result, err
 }
 
-func (c *Client) GetInstrument(instrumentName string) (o InstrumentResult, err error) {
-	res, err := c.Get(urlGetInstrument, map[string]interface{}{
+func (c *Client) GetInstrument(instrumentName string) (o Instrument, err error) {
+	var instrumentResp InstrumentResp
+	if err = c.GetAndUnmarshalJson(urlGetInstrument, map[string]interface{}{
 		"instrument_name": instrumentName,
-	})
-	if err != nil {
+	}, &instrumentResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return instrumentResp.Result, err
 }
 
-func (c *Client) GetOrderBook(instrumentName string, depth int) (o OrderBookResult, err error) {
-	res, err := c.Get(urlGetOrderBook, map[string]interface{}{
+func (c *Client) GetOrderBook(instrumentName string, depth int) (o OrderBook, err error) {
+	var orderBookResp OrderBookResp
+	if err = c.GetAndUnmarshalJson(urlGetOrderBook, map[string]interface{}{
 		"instrument_name": instrumentName,
 		"depth":           depth,
-	})
-	if err != nil {
+	}, &orderBookResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return orderBookResp.Result, err
 }
 
 func (c *Client) GetIndexPrice(indexName string) (o IndexPriceResult, err error) {
-	res, err := c.Get(urlGetIndexPrice, map[string]interface{}{
+	var indexPriceResp IndexPriceResp
+	if err = c.GetAndUnmarshalJson(urlGetIndexPrice, map[string]interface{}{
 		"index_name": indexName,
-	})
-	if err != nil {
+	}, &indexPriceResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return indexPriceResp.Result, err
 }

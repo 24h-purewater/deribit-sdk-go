@@ -2,9 +2,11 @@ package deribit
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -52,6 +54,26 @@ func (c *Client) Get(path string, query map[string]interface{}) ([]byte, error) 
 		return body, err
 	}
 	return body, nil
+}
+
+func valueOf(i interface{}) reflect.Value {
+	return reflect.ValueOf(i)
+}
+func getPointer(v interface{}) interface{} {
+	vv := valueOf(v)
+	if vv.Kind() == reflect.Ptr {
+		return v
+	}
+	return reflect.New(vv.Type()).Interface()
+}
+
+func (c *Client) GetAndUnmarshalJson(path string, query map[string]interface{}, v interface{}) error {
+	jsonData, err := c.Get(path, query)
+	if err != nil {
+		return err
+	}
+	pointer := getPointer(v)
+	return json.Unmarshal(jsonData, &pointer)
 }
 
 func toQueryString(queryMap map[string]interface{}) (qs string) {

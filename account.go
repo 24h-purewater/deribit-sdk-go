@@ -1,7 +1,6 @@
 package deribit
 
 import (
-	"encoding/json"
 	"strconv"
 )
 
@@ -13,52 +12,48 @@ const (
 )
 
 // GetPositions https://docs.deribit.com/#private-get_positions
-func (c *Client) GetPositions(currency, kind string) (o PositionListResult, err error) {
-	res, err := c.Get(urlGetPositions, map[string]interface{}{
+func (c *Client) GetPositions(currency, kind string) (positionList []PositionListResult, err error) {
+	var positionResp PositionListResp
+	if err = c.GetAndUnmarshalJson(urlGetPositions, map[string]interface{}{
 		"currency": currency,
 		"kind":     kind,
-	})
-	if err != nil {
-		return o, err
+	}, &positionResp); err != nil {
+		return positionList, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return positionResp.Result, err
 }
 
 func (c *Client) GetPosition(instrumentName string) (o GetPositionResult, err error) {
-	res, err := c.Get(urlGetPosition, map[string]interface{}{
+	var getPositionResp GetPositionResp
+	if err = c.GetAndUnmarshalJson(urlGetPosition, map[string]interface{}{
 		"instrument_name": instrumentName,
-	})
-	if err != nil {
+	}, &getPositionResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return getPositionResp.Result, err
 }
 
-func (c *Client) GetTransactionLogResult(currency, query string, startTs, endTs int64) (o GetTransactionLogResult, err error) {
-	res, err := c.Get(urlGetTransactionLog, map[string]interface{}{
+func (c *Client) GetTransactionLogResult(currency, query string, startTs, endTs int64) (logList []TransactionLog, err error) {
+	var getTxLogResult GetTransactionLogResp
+	if err = c.GetAndUnmarshalJson(urlGetTransactionLog, map[string]interface{}{
 		"currency":        currency,
 		"start_timestamp": strconv.Itoa(int(startTs)),
 		"end_timestamp":   strconv.Itoa(int(endTs)),
 		"query":           query,
-	})
-	if err != nil {
-		return o, err
+	}, &getTxLogResult); err != nil {
+		return logList, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return getTxLogResult.Result.Logs, err
 }
 
 // GetAccountSummary https://docs.deribit.com/#private-get_account_summary
-func (c *Client) GetAccountSummary(currency string, extended bool) (o GetAccountSummaryResult, err error) {
-	res, err := c.Get(urlGetAccountSummary, map[string]interface{}{
+func (c *Client) GetAccountSummary(currency string, extended bool) (o AccountSummary, err error) {
+	var getAccountSummaryResp GetAccountSummaryResp
+	if err = c.GetAndUnmarshalJson(urlGetAccountSummary, map[string]interface{}{
 		"currency": currency,
 		"extended": extended,
-	})
-	if err != nil {
+	}, getAccountSummaryResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return getAccountSummaryResp.Result, err
 }

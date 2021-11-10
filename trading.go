@@ -1,9 +1,5 @@
 package deribit
 
-import (
-	"encoding/json"
-)
-
 const (
 	urlGetOpenOrdersByCurrency = "/api/v2/private/get_open_orders_by_currency"
 	urlGetUserTradesByCurrency = "/api/v2/private/get_user_trades_by_currency"
@@ -12,64 +8,61 @@ const (
 	urlCancel                  = "/api/v2/private/cancel"
 )
 
-//https://docs.deribit.com/#private-buy
+//Buy https://docs.deribit.com/#private-buy
 func (c *Client) Buy(instrumentName, amount, orderType string) (o BuyResult, err error) {
-	res, err := c.Get(urlBuy, map[string]interface{}{
+	var buyResult BuyResp
+	if err = c.GetAndUnmarshalJson(urlBuy, map[string]interface{}{
 		"instrument_name": instrumentName,
 		"amount":          amount,
 		"type":            orderType,
-	})
-	if err != nil {
+	}, &buyResult); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return buyResult.Result, err
 }
 
-//https://docs.deribit.com/#private-sell
+//Sell https://docs.deribit.com/#private-sell
 func (c *Client) Sell(instrumentName, amount, orderType string) (o SellResult, err error) {
-	res, err := c.Get(urlSell, map[string]interface{}{
+	var sellResp SellResp
+	if err = c.GetAndUnmarshalJson(urlSell, map[string]interface{}{
 		"instrument_name": instrumentName,
 		"amount":          amount,
 		"type":            orderType,
 		//"price":           price,
-	})
-	if err != nil {
+	}, &sellResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return sellResp.Result, err
 }
 
-//https://docs.deribit.com/#private-cancel
+//Cancel https://docs.deribit.com/#private-cancel
 func (c *Client) Cancel(orderID string) (o CancelResult, err error) {
-	res, err := c.Get(urlCancel, map[string]interface{}{
+	var cancelResp CancelResp
+	if err = c.GetAndUnmarshalJson(urlCancel, map[string]interface{}{
 		"order_id": orderID,
-	})
-	if err != nil {
+	}, &cancelResp); err != nil {
 		return o, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return cancelResp.Result, err
 }
 
-//https://docs.deribit.com/#private-get_open_orders_by_currency
-func (c *Client) GetOpenOrdersByCurrency(currency, kind, orderType string) (o OrderListResult, err error) {
-	res, err := c.Get(urlGetOpenOrdersByCurrency, map[string]interface{}{
+//GetOpenOrdersByCurrency https://docs.deribit.com/#private-get_open_orders_by_currency
+func (c *Client) GetOpenOrdersByCurrency(currency, kind, orderType string) (orderList []Order, err error) {
+	var orderListResp OrderListResp
+	if err = c.GetAndUnmarshalJson(urlGetOpenOrdersByCurrency, map[string]interface{}{
 		"currency": currency,
 		"kind":     kind,
 		"type":     orderType,
-	})
-	if err != nil {
-		return o, err
+	}, &orderListResp); err != nil {
+		return nil, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return orderListResp.Result, err
 }
 
-//https://docs.deribit.com/#private-get_user_trades_by_currency
-func (c *Client) GetUserTradesByCurrency(currency, kind, startId, endId, sorting string, count int64, includeOld bool) (o TradeListResult, err error) {
-	res, err := c.Get(urlGetUserTradesByCurrency, map[string]interface{}{
+//GetUserTradesByCurrency https://docs.deribit.com/#private-get_user_trades_by_currency
+func (c *Client) GetUserTradesByCurrency(currency, kind, startId, endId, sorting string, count int64, includeOld bool) (tradeList []Trade, err error) {
+	var tradeListResp TradeListResp
+	if err = c.GetAndUnmarshalJson(urlGetUserTradesByCurrency, map[string]interface{}{
 		"currency":    currency,
 		"kind":        kind,
 		"start_id":    startId,
@@ -77,10 +70,8 @@ func (c *Client) GetUserTradesByCurrency(currency, kind, startId, endId, sorting
 		"count":       count,
 		"include_old": includeOld,
 		"sorting":     sorting,
-	})
-	if err != nil {
-		return o, err
+	}, &tradeListResp); err != nil {
+		return nil, err
 	}
-	err = json.Unmarshal(res, &o)
-	return o, err
+	return tradeListResp.Result.Trades, err
 }
