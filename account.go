@@ -52,7 +52,7 @@ func (c *Client) GetAccountSummary(currency string, extended bool) (o AccountSum
 	if err = c.GetAndUnmarshalJson(urlGetAccountSummary, map[string]interface{}{
 		"currency": currency,
 		"extended": extended,
-	}, getAccountSummaryResp); err != nil {
+	}, &getAccountSummaryResp); err != nil {
 		return o, err
 	}
 	return getAccountSummaryResp.Result, err
