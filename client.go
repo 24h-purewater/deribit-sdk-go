@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"strings"
@@ -30,6 +31,17 @@ func New(endpoint, clientId, secret string) *Client {
 		ClientId: clientId,
 		Secret:   secret,
 	}
+}
+
+func NewWithProxy(endpoint, clientId, secret, httpProxy string) *Client {
+	dbClient := New(endpoint, clientId, secret)
+	if httpProxy != "" {
+		proxyAddress, _ := url.Parse(httpProxy)
+		dbClient.Client.Transport = &http.Transport{
+			Proxy: http.ProxyURL(proxyAddress),
+		}
+	}
+	return dbClient
 }
 
 func (c *Client) Get(path string, query map[string]interface{}) ([]byte, error) {

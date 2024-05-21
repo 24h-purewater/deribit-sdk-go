@@ -322,33 +322,38 @@ type GetTransactionLogResp struct {
 }
 
 type TransactionLog struct {
-	Username         string      `json:"username"`
-	UserSeq          int         `json:"user_seq"`
-	UserID           int         `json:"user_id"`
-	Type             string      `json:"type"`
-	TradeID          string      `json:"trade_id"`
-	Timestamp        int64       `json:"timestamp"`
-	Side             string      `json:"side"`
-	Price            interface{} `json:"price"`
-	Position         interface{} `json:"position"`
-	OrderID          string      `json:"order_id"`
-	InterestPl       interface{} `json:"interest_pl"`
-	InstrumentName   string      `json:"instrument_name"`
-	Info             string      `json:"info,omitempty"`
-	ID               int         `json:"id"`
-	Equity           float64     `json:"equity"`
-	Currency         string      `json:"currency"`
-	Commission       float64     `json:"commission"`
-	Change           float64     `json:"change"`
-	Cashflow         float64     `json:"cashflow"`
-	Balance          float64     `json:"balance"`
-	TotalInterestPl  float64     `json:"total_interest_pl,omitempty"`
-	SessionUpl       float64     `json:"session_upl,omitempty"`
-	SessionRpl       float64     `json:"session_rpl,omitempty"`
-	PriceCurrency    string      `json:"price_currency,omitempty"`
-	UserRole         string      `json:"user_role,omitempty"`
-	ProfitAsCashflow bool        `json:"profit_as_cashflow,omitempty"`
-	MarkPrice        float64     `json:"mark_price,omitempty"`
+	SessionUpl     float64     `json:"session_upl,omitempty"`
+	SessionRpl     float64     `json:"session_rpl,omitempty"`
+	PriceCurrency  string      `json:"price_currency,omitempty"`
+	TradeID        string      `json:"trade_id"`
+	InterestPl     interface{} `json:"interest_pl"`
+	Side           string      `json:"side"`
+	UserSeq        int         `json:"user_seq"`
+	Equity         float64     `json:"equity"`
+	FeeBalance     float64     `json:"fee_balance"`
+	InstrumentName string      `json:"instrument_name"`
+	OrderID        string      `json:"order_id"`
+	Amount         float64     `json:"amount"`
+
+	Username        string      `json:"username"`
+	MarkPrice       float64     `json:"mark_price,omitempty"`
+	IndexPrice      float64     `json:"index_price"`
+	Cashflow        float64     `json:"cashflow"`
+	Commission      float64     `json:"commission"`
+	UserID          int         `json:"user_id"`
+	Price           float64     `json:"price"`
+	Change          float64     `json:"change"`
+	Currency        string      `json:"currency"`
+	Balance         float64     `json:"balance"`
+	Type            string      `json:"type"`
+	Timestamp       int64       `json:"timestamp"`
+	Position        interface{} `json:"position"`
+	Info            string      `json:"info,omitempty"`
+	ID              int         `json:"id"`
+	TotalInterestPl float64     `json:"total_interest_pl,omitempty"`
+
+	UserRole         string `json:"user_role,omitempty"`
+	ProfitAsCashflow bool   `json:"profit_as_cashflow,omitempty"`
 }
 
 type TxLogInfo struct {

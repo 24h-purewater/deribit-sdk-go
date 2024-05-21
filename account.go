@@ -1,8 +1,6 @@
 package deribit
 
-import (
-	"strconv"
-)
+import "github.com/spf13/cast"
 
 const (
 	urlGetPositions      = "/api/v2/private/get_positions"
@@ -33,14 +31,26 @@ func (c *Client) GetPosition(instrumentName string) (o GetPositionResult, err er
 	return getPositionResp.Result, err
 }
 
-func (c *Client) GetTransactionLogResult(currency, query string, startTs, endTs int64) (logList []TransactionLog, err error) {
+type TxLogReq struct {
+	Currency, Query                     string
+	StartTs, EndTs, Count, Continuation int64
+}
+
+func (c *Client) GetTransactionLogResult(txLogReq TxLogReq) (logList []TransactionLog, err error) {
 	var getTxLogResult GetTransactionLogResp
-	if err = c.GetAndUnmarshalJson(urlGetTransactionLog, map[string]interface{}{
-		"currency":        currency,
-		"start_timestamp": strconv.Itoa(int(startTs)),
-		"end_timestamp":   strconv.Itoa(int(endTs)),
-		"query":           query,
-	}, &getTxLogResult); err != nil {
+	queryMap := map[string]interface{}{
+		"currency":        txLogReq.Currency,
+		"start_timestamp": cast.ToString(txLogReq.StartTs),
+		"end_timestamp":   cast.ToString(txLogReq.EndTs),
+		"query":           txLogReq.Query,
+	}
+	if txLogReq.Count > 0 {
+		queryMap["count"] = txLogReq.Count
+	}
+	if txLogReq.Continuation > 0 {
+		queryMap["continuation"] = txLogReq.Continuation
+	}
+	if err = c.GetAndUnmarshalJson(urlGetTransactionLog, queryMap, &getTxLogResult); err != nil {
 		return logList, err
 	}
 	return getTxLogResult.Result.Logs, err
